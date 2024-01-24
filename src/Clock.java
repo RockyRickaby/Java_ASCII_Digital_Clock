@@ -4,36 +4,39 @@ import java.util.TimerTask;
 
 public class Clock {
     private long secs;
+    private long prevSecs;
     private int h24;
     private Timer timer;
     private String time;
-    private String prevTime;
-    private boolean running;
+    private boolean running, firstPrint;
 
     public Clock(long secs, boolean h24) {
         this.secs = secs;
-        this.time = null;
-        this.prevTime = null;
-        timer = new Timer(true);
-        this.h24 = h24 ? 24 : 12;
+        this.prevSecs = secs;
         this.running = false;
+        this.firstPrint = true;
+        this.time = null;
+        this.h24 = h24 ? 24 : 12;
+        timer = new Timer(true);
     }
 
     public Clock(boolean currentTime, boolean h24) {
+        long timeL = 0;
         if (currentTime) {
             LocalDateTime d = LocalDateTime.now();
-            long timeL = (d.getHour() * 3600) + (d.getMinute() * 60) + d.getSecond();
-            this.secs = timeL;
-        } else {
-            this.secs = 0;
+            timeL = (d.getHour() * 3600) + (d.getMinute() * 60) + d.getSecond();
         }
-        this.time = this.prevTime = null;
+        this.secs = timeL;
+        this.prevSecs = secs;
+        this.time = null;
         this.timer = new Timer(true);
         this.h24 = h24 ? 24 : 12;
         this.running = false;
+        this.firstPrint = true;
     }
 
     public Clock setTime(long secs) {
+        this.prevSecs = 0;
         this.secs = secs;
         return this;
     }
@@ -51,23 +54,32 @@ public class Clock {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                prevTime = time;
-                long hour = (secs / 3600) % 24;
+                long hour = (secs / 3600) % 24,
+                     mins = (secs / 60) % 60;
                 
                 if (!includeSecs) {
-                    
-                }
-                if (includeSecs) {
-                    time = ToClock.getTimeAsString(hour, (secs / 60) % 60, secs % 60, h24);
+                    long prevSecsHour = (prevSecs / 3600) % 24;
+                    long prevSecsMins = (prevSecs / 60) % 60;
+                    if (hour == prevSecsHour && mins == prevSecsMins) {
+                        if (firstPrint) {
+                            firstPrint = !firstPrint;
+                            time = ToClock.getTimeAsString(hour, mins, -1, h24);
+                            System.out.print("\033[H\033[2J");  
+                            System.out.flush();  
+                            System.out.printf("%s\n", time);
+                        }
+                        secs++;
+                        return;
+                    }
+                    prevSecs = secs;
+                    time = ToClock.getTimeAsString(hour, mins, -1, h24);
                 } else {
-                    time = ToClock.getTimeAsString(hour, (secs / 60) % 60, h24);
+                    time = ToClock.getTimeAsString(hour, mins, secs % 60, h24);
                 }
 
-                if (!time.equals(prevTime)) {
-                    System.out.print("\033[H\033[2J");  
-                    System.out.flush();  
-                    System.out.printf("%s\n", time);
-                }
+                System.out.print("\033[H\033[2J");  
+                System.out.flush();  
+                System.out.printf("%s\n", time);
                 if (secs == 86400) {
                     secs = 0;
                 }

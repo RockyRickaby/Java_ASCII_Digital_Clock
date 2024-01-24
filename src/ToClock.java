@@ -16,6 +16,7 @@ public class ToClock {
 
     private static final String DOTS = "     \n  #  \n     \n  #  \n     ";
     private static final int CHAR_LEN = 5;
+    private static String cached1 = null, cached2 = null;
 
     /**
      * No need for creating instances of this class.
@@ -23,53 +24,19 @@ public class ToClock {
     private ToClock() {
     }
 
-    public static String getTimeAsString(long hours, long minutes, int h24) {
-        int ampmIdx = 0;
-        if (h24 == 12) {
-            long auxHour = hours % h24;
-            if (auxHour == 0) {
-                auxHour = 12;
-            }
-            if (hours >= 12) {
-                ampmIdx = 1;
-            }
-            hours = auxHour;
-        }
-
-        String[] hourDec = NUMS[(int) hours / 10].split("\n");
-        String[] hourUnit = NUMS[(int) hours % 10].split("\n");
-
-        String[] minDec = NUMS[(int) minutes / 10].split("\n");
-        String[] minUnit = NUMS[(int) minutes % 10].split("\n");
-
-        String[] theAorP = AMPM[ampmIdx].split("\n");
-        String[] theM = AMPM[2].split("\n");
-
-        String[] dots = DOTS.split("\n");
-
-        StringBuilder str = new StringBuilder();
-        for (int i = 0; i < CHAR_LEN; i++) {
-            str.append(hourDec[i])
-               .append("  ")
-               .append(hourUnit[i])
-               //.append("  ")
-               .append(dots[i])
-               //.append("  ")
-               .append(minDec[i])
-               .append("  ")
-               .append(minUnit[i]);
-               //.append("\n");
-            if (h24 == 12) {
-                str.append("     ")
-                   .append(theAorP[i])
-                   .append("  ")
-                   .append(theM[i]);
-            }
-            str.append("\n");
-        }
-        return str.toString();
-    }
-
+    /**
+     * Returns an ASCII clock (as a String) with the values of {@code hours} as
+     * the clock's hours, {@code minutes} as the clock's minutes
+     * and {@code seconds} as the clock's seconds.
+     * <p>
+     * If {@code seconds} is less than or
+     * equal to -1, seconds will be omitted.
+     * @param hours hours
+     * @param minutes minutes
+     * @param seconds seconds.
+     * @param h24 12 for 12 hour clock. 24 for 24 hour clock.
+     * @return the generated ASCII clock as a String.
+     */
     public static String getTimeAsString(long hours, long minutes, long seconds, int h24) {
         int ampmIdx = 0;
         if (h24 == 12) {
@@ -89,11 +56,16 @@ public class ToClock {
         String[] minDec = NUMS[(int) minutes / 10].split("\n");
         String[] minUnit = NUMS[(int) minutes % 10].split("\n");
 
-        String[] secDec = NUMS[(int) seconds / 10].split("\n");
-        String[] secUnit = NUMS[(int) seconds % 10].split("\n");
+        String[] secDec = null;
+        String[] secUnit = null;
+
+        if (seconds > -1) {
+            secDec = NUMS[(int) seconds / 10].split("\n");
+            secUnit = NUMS[(int) seconds % 10].split("\n");
+        }  
 
         String[] theAorP = AMPM[ampmIdx].split("\n");
-        String[] theM = NUMS[10].split("\n");
+        String[] theM = AMPM[2].split("\n");
 
         String[] dots = DOTS.split("\n");
 
@@ -102,21 +74,18 @@ public class ToClock {
             str.append(hourDec[i])
                .append("  ")
                .append(hourUnit[i])
-               //.append("  ")
                .append(dots[i])
-               //.append("  ")
                .append(minDec[i])
                .append("  ")
-               .append(minUnit[i])
-               //.append("  ")
-               .append(dots[i])
-               //.append("  ")
-               .append(secDec[i])
-               .append("  ")
-               .append(secUnit[i]);
-                //.append("\n");
+               .append(minUnit[i]);
+            if (seconds > -1) {
+                str.append(dots[i])
+                   .append(secDec[i])
+                   .append("  ")
+                   .append(secUnit[i]);
+            }
             if (h24 == 12) {
-                str.append("     ")
+                str.append("      ")
                    .append(theAorP[i])
                    .append("  ")
                    .append(theM[i]);
