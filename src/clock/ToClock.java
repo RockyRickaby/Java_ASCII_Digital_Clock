@@ -17,7 +17,6 @@ public class ToClock {
 
     private static final String DOTS = "     \n  #  \n     \n  #  \n     ";
     private static final int CHAR_LEN = 5;
-    private static String[] cached1 = null, cached2 = null;
 
     /**
      * No need for creating instances of this class.
