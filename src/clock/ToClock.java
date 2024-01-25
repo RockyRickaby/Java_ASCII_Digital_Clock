@@ -1,4 +1,8 @@
 package clock;
+/**
+ * Formatter. This class generates an ASCII representation of a 
+ * digital clock.
+ */
 public class ToClock {
     private static final String[] NUMS = {"#####\n#   #\n#   #\n#   #\n#####", // 0
                                           "  #  \n ##  \n  #  \n  #  \n#####", // 1
