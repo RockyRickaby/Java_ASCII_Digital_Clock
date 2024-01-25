@@ -1,27 +1,29 @@
+package clock;
 import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Clock {
-    private long secs;
-    private long prevSecs;
-    private int h24;
+    private int secs;
+    private int prevSecs;
     private Timer timer;
     private String time;
     private boolean running, firstPrint;
 
-    public Clock(long secs, boolean h24) {
+    public Clock(int secs) {
+        if (secs < 0) {
+            secs = 0;
+        }
         this.secs = secs;
         this.prevSecs = secs;
         this.running = false;
         this.firstPrint = true;
         this.time = null;
-        this.h24 = h24 ? 24 : 12;
         timer = new Timer(true);
     }
 
-    public Clock(boolean currentTime, boolean h24) {
-        long timeL = 0;
+    public Clock(boolean currentTime) {
+        int timeL = 0;
         if (currentTime) {
             LocalDateTime d = LocalDateTime.now();
             timeL = (d.getHour() * 3600) + (d.getMinute() * 60) + d.getSecond();
@@ -30,20 +32,22 @@ public class Clock {
         this.prevSecs = secs;
         this.time = null;
         this.timer = new Timer(true);
-        this.h24 = h24 ? 24 : 12;
         this.running = false;
         this.firstPrint = true;
     }
 
-    public Clock setTime(long secs) {
-        this.prevSecs = 0;
+    public Clock setTime(int secs) {
+        if (secs < 0) {
+            secs = 0;
+        }
         this.secs = secs;
         return this;
     }
     
     public boolean isRunning() { return running; }
 
-    public Clock start(boolean includeSecs) {
+    public Clock start(boolean _24hour, boolean includeSecs) {
+        int h24 = _24hour ? 24 : 12;
         if (running) {
             return this;
         }
@@ -54,33 +58,29 @@ public class Clock {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                long hour = (secs / 3600) % 24,
-                     mins = (secs / 60) % 60;
+                int hour = (secs / 3600) % 24,
+                    mins = (secs / 60) % 60,
+                    seconds = secs % 60;
                 
                 if (!includeSecs) {
-                    long prevSecsHour = (prevSecs / 3600) % 24;
-                    long prevSecsMins = (prevSecs / 60) % 60;
+                    int prevSecsHour = (prevSecs / 3600) % 24;
+                    int prevSecsMins = (prevSecs / 60) % 60;
+                    seconds = -1;
                     if (hour == prevSecsHour && mins == prevSecsMins) {
                         if (firstPrint) {
                             firstPrint = !firstPrint;
-                            time = ToClock.getTimeAsString(hour, mins, -1, h24);
-                            System.out.print("\033[H\033[2J");  
-                            System.out.flush();  
-                            System.out.printf("%s\n", time);
+                            time = ToClock.getTimeAsString(hour, mins, seconds, h24);
+                            printClock(time);
                         }
                         secs++;
                         return;
                     }
                     prevSecs = secs;
-                    time = ToClock.getTimeAsString(hour, mins, -1, h24);
-                } else {
-                    time = ToClock.getTimeAsString(hour, mins, secs % 60, h24);
                 }
+                time = ToClock.getTimeAsString(hour, mins, seconds, h24);
 
-                System.out.print("\033[H\033[2J");  
-                System.out.flush();  
-                System.out.printf("%s\n", time);
-                if (secs == 86400) {
+                printClock(time);
+                if (secs >= 86400) {
                     secs = 0;
                 }
                 secs++;
@@ -96,5 +96,11 @@ public class Clock {
         }
         this.running = false;
         return this;
+    }
+
+    private static void printClock(String clock) {
+        System.out.print("\033[H\033[2J");  
+        System.out.flush();  
+        System.out.printf("%s\n", clock);
     }
 }
