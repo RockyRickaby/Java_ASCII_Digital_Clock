@@ -1,5 +1,3 @@
-// import java.time.LocalDateTime;
-
 import java.util.Scanner;
 
 import clock.Clock;
@@ -79,7 +77,6 @@ public class App {
             in.close();    
         }
         while (cloc.isRunning()) {
-            
         }
     }
 }

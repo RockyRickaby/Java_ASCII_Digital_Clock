@@ -4,22 +4,22 @@ package clock;
  * digital clock.
  */
 public class ToClock {
-    private static final String[] NUMS = {"#####\n#   #\n#   #\n#   #\n#####", // 0
-                                          "  #  \n ##  \n  #  \n  #  \n#####", // 1
-                                          "#####\n    #\n#####\n#    \n#####", // 2
-                                          "#####\n    #\n#####\n    #\n#####", // 3
-                                          "#   #\n#   #\n#####\n    #\n    #", // 4
-                                          "#####\n#    \n#####\n    #\n#####", // 5
-                                          "#####\n#    \n#####\n#   #\n#####", // 6
-                                          "#####\n   # \n  #  \n #   \n#    ", // 7
-                                          "#####\n#   #\n#####\n#   #\n#####", // 8
-                                          "#####\n#   #\n#####\n    #\n#####"}; // 9
+    private static final String[][] NUMS = {{"#####", "#   #", "#   #", "#   #", "#####"},
+                                            {"  #  ", " ##  ", "  #  ", "  #  ", "#####"},
+                                            {"#####", "    #", "#####", "#    ", "#####"},
+                                            {"#####", "    #", "#####", "    #", "#####"},
+                                            {"#   #", "#   #", "#####", "    #", "    #"},
+                                            {"#####", "#    ", "#####", "    #", "#####"},
+                                            {"#####", "#    ", "#####", "#   #", "#####"},
+                                            {"#####", "   # ", "  #  ", " #   ", "#    "},
+                                            {"#####", "#   #", "#####", "#   #", "#####"},
+                                            {"#####", "#   #", "#####", "    #", "#####"}};
 
-    private static final String[] AMPM = {"#####\n#   #\n#####\n#   #\n#   #", // A
-                                          "#####\n#   #\n#####\n#    \n#    ", // P
-                                          "#   #\n## ##\n# # #\n#   #\n#   #"}; // M
+    private static final String[][] APM = {{"#####", "#   #", "#####", "#   #", "#   #"}, // A
+                                           {"#####", "#   #", "#####", "#    ", "#    "}, // p
+                                           {"#   #", "## ##", "# # #", "#   #", "#   #"}}; // M
 
-    private static final String DOTS = "     \n  #  \n     \n  #  \n     ";
+    private static final String[] DOTS = {"     ", "  #  ", "     ", "  #  ", "     "};
     private static final int CHAR_LEN = 5;
 
     /**
@@ -54,49 +54,40 @@ public class ToClock {
             hours = auxHour;
         }
 
-        String[] hourDec = NUMS[hours / 10].split("\n");
-        String[] hourUnit = NUMS[hours % 10].split("\n");
+        String[] hourDec = NUMS[hours / 10];
+        String[] hourUnit = NUMS[hours % 10];
 
-        String[] minDec = NUMS[minutes / 10].split("\n");
-        String[] minUnit = NUMS[minutes % 10].split("\n");
+        String[] minDec = NUMS[minutes / 10];
+        String[] minUnit = NUMS[minutes % 10];
 
         String[] secDec = null;
         String[] secUnit = null;
 
-        String[] theAorP = null;
-        String[] theM = null;
-
         if (seconds > -1) {
-            secDec = NUMS[seconds / 10].split("\n");
-            secUnit = NUMS[seconds % 10].split("\n");
-        }
-        if (h24 == 12) {
-            theAorP = AMPM[ampmIdx].split("\n");
-            theM = AMPM[2].split("\n");
+            secDec = NUMS[seconds / 10];
+            secUnit = NUMS[seconds % 10];
         }
  
-        String[] dots = DOTS.split("\n");
-
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < CHAR_LEN; i++) {
             str.append(hourDec[i])
                .append("  ")
                .append(hourUnit[i])
-               .append(dots[i])
+               .append(DOTS[i])
                .append(minDec[i])
                .append("  ")
                .append(minUnit[i]);
             if (seconds > -1) {
-                str.append(dots[i])
+                str.append(DOTS[i])
                    .append(secDec[i])
                    .append("  ")
                    .append(secUnit[i]);
             }
             if (h24 == 12) {
                 str.append("      ")
-                   .append(theAorP[i])
+                   .append(APM[ampmIdx][i])
                    .append("  ")
-                   .append(theM[i]);
+                   .append(APM[2][i]);
             }
             str.append("\n");
         }
