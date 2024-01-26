@@ -3,15 +3,27 @@ import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 /**
- * The Clock class is self-explanatory, though it should be informed that
- * this is a DIGITAL clock, not an analogue clock.
+ * The Clock class is self-explanatory. This class represents a DIGITAL
+ * ASCII clock which may or may not use the current system time as its
+ * current time.
+ * <p>
+ * It is possible to have the Clock be either a 12 or a 24 hour clock.
+ * Being a 12 or 24 hour clock is not an instance attribute, but rather something that can
+ * be defined when starting the clock. In other words, there is no need to create 
+ * other instances of Clock if the format is a problem, as restarting it will be
+ * enough (if only one clock is ever needed). This is also valid for whether the Clock
+ * has to show the seconds passed or not.
+ * <p>
+ * The Clock is updated with the help of the {@link java.util.Timer} class, which, in the case of the Clock
+ * class, fires up a new thread whenever the Clock is started
+ * (for the first time or after having stopped before starting again).
  */
 public class Clock {
     private int secs;
     private int prevSecs;
     private Timer timer;
-    private String time;
-    private boolean running, firstPrint;
+    private String clock;
+    private boolean running;
 
     /**
      * Creates a new Clock. The time of the clock
@@ -24,11 +36,10 @@ public class Clock {
         if (secs < 0) {
             secs = 0;
         }
-        this.secs = secs;
-        this.prevSecs = secs;
+        this.secs = secs % 86400;
+        this.prevSecs = Integer.MIN_VALUE;
         this.running = false;
-        this.firstPrint = true;
-        this.time = null;
+        this.clock = null;
         timer = new Timer(true);
     }
 
@@ -46,11 +57,10 @@ public class Clock {
             timeL = (d.getHour() * 3600) + (d.getMinute() * 60) + d.getSecond();
         }
         this.secs = timeL;
-        this.prevSecs = secs;
-        this.time = null;
+        this.prevSecs = Integer.MIN_VALUE;
+        this.clock = null;
         this.timer = new Timer(true);
         this.running = false;
-        this.firstPrint = true;
     }
 
     /**
@@ -63,7 +73,7 @@ public class Clock {
         if (secs < 0) {
             secs = 0;
         }
-        this.secs = secs;
+        this.secs = secs % 86400;
         return this;
     }
     
@@ -103,23 +113,15 @@ public class Clock {
                     int prevSecsMins = (prevSecs / 60) % 60;
                     seconds = -1;
                     if (hour == prevSecsHour && mins == prevSecsMins) {
-                        if (firstPrint) {
-                            firstPrint = !firstPrint;
-                            time = ToClock.getTimeAsString(hour, mins, seconds, h24);
-                            printClock(time);
-                        }
-                        secs++;
+                        secs = (secs + 1) % 86400;
                         return;
                     }
                     prevSecs = secs;
                 }
-                time = ToClock.getTimeAsString(hour, mins, seconds, h24);
+                clock = ToClock.getTimeAsString(hour, mins, seconds, h24);
 
-                printClock(time);
-                if (secs >= 86400) {
-                    secs = 0;
-                }
-                secs++;
+                printClock(clock);
+                secs = (secs + 1) % 86400;
             }
         }, 0, 1000);
         return this;
