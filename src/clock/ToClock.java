@@ -35,21 +35,21 @@ public class ToClock {
      * <p>
      * If {@code seconds} is less than or
      * equal to -1, seconds will be omitted.
-     * @param hours hours
-     * @param minutes minutes
-     * @param seconds seconds.
-     * @param h24 12 for 12 hour clock. 24 for 24 hour clock.
+     * @param hours
+     * @param minutes
+     * @param seconds
+     * @param h24 {@code true} for a 24-hour clock. {@code false} for a 12-hour clock.
      * @return the generated ASCII clock as a String.
      */
-    protected static String getTimeAsString(int hours, int minutes, int seconds, int h24) {
-        int ampmIdx = 0;
-        if (h24 == 12) {
+    protected static String getTimeAsString(int hours, int minutes, int seconds, boolean h24) {
+        if (hours < 0 || minutes < 0) {
+            throw new IllegalArgumentException("Hours and/or minutes cannot be negative.");
+        }
+        int ampmIdx = (hours % 24) / 12;
+        if (!h24) {
             int auxHour = hours % 12;
             if (auxHour == 0) {
                 auxHour = 12;
-            }
-            if (hours >= 12) {
-                ampmIdx = 1;
             }
             hours = auxHour;
         }
@@ -83,7 +83,7 @@ public class ToClock {
                    .append("  ")
                    .append(secUnit[i]);
             }
-            if (h24 == 12) {
+            if (!h24) {
                 str.append("      ")
                    .append(APM[ampmIdx][i])
                    .append("  ")

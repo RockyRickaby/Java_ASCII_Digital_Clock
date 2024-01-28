@@ -58,9 +58,9 @@ public class Clock {
         }
         this.secs = timeL;
         this.prevSecs = Integer.MIN_VALUE;
+        this.running = false;
         this.clock = null;
         this.timer = new Timer(true);
-        this.running = false;
     }
 
     /**
@@ -93,7 +93,6 @@ public class Clock {
      * @return this Clock.
      */
     public Clock start(boolean _24hour, boolean includeSecs) {
-        int h24 = _24hour ? 24 : 12;
         if (running) {
             return this;
         }
@@ -118,7 +117,7 @@ public class Clock {
                     }
                     prevSecs = secs;
                 }
-                clock = ToClock.getTimeAsString(hour, mins, seconds, h24);
+                clock = ToClock.getTimeAsString(hour, mins, seconds, _24hour);
 
                 printClock(clock);
                 secs = (secs + 1) % 86400;
