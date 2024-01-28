@@ -30,7 +30,7 @@ public class Clock {
      * is defined by the number of seconds passed
      * since midnight. The day/time zone does not matter.
      * 
-     * @param secs seconds since midnight.
+     * @param secs the number of seconds since midnight.
      */
     public Clock(int secs) {
         if (secs < 0) {
@@ -48,7 +48,8 @@ public class Clock {
      * by the current system time (if so desired).
      * 
      * @param currentTime if {@code true}, this instance of clock
-     * will use the current system time.
+     * will use the current system time. It will start at midnight
+     * if otherwise.
      */
     public Clock(boolean currentTime) {
         int timeL = 0;
@@ -64,7 +65,8 @@ public class Clock {
     }
 
     /**
-     * Changes this Clock's time.
+     * Changes this Clock's time. If {@code secs} is negative, the number
+     * of seconds will be set to 0.
      * 
      * @param secs the number of seconds since midnight.
      * @return this Clock.
@@ -85,7 +87,8 @@ public class Clock {
     public boolean isRunning() { return running; }
 
     /**
-     * Starts this Clock.
+     * Starts this Clock. If already running, this method will just return
+     * this Clock and not do anything else.
      * 
      * @param _24hour if {@code true}, the 24 hour will be used to
      * represent this Clock.
@@ -127,7 +130,8 @@ public class Clock {
     }
 
     /**
-     * Stops this Clock.
+     * Stops this Clock. This method does NOT reset the Clock's time.
+     * The clock will just stop ticking.
      * @return this Clock.
      */
     public Clock stop() {
@@ -142,7 +146,7 @@ public class Clock {
     /**
      * This just prints something on the screen while also
      * "clearing" the terminal. In the case of this class, it'll
-     * be the Clock itself.
+     * be the Clock itself what's being printed.
      * @param clock whatever you might want to print.
      */
     private static void printClock(String clock) {
