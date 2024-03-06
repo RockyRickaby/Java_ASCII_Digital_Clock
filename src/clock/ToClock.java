@@ -45,7 +45,7 @@ public class ToClock {
         if (hours < 0 || minutes < 0) {
             throw new IllegalArgumentException("Hours and/or minutes cannot be negative.");
         }
-        int ampmIdx = (hours % 24) / 12;
+        int amOrpmIdx = (hours % 24) / 12;
         if (!h24) {
             int auxHour = hours % 12;
             if (auxHour == 0) {
@@ -54,38 +54,38 @@ public class ToClock {
             hours = auxHour;
         }
 
-        String[] hourDec = NUMS[hours / 10];
-        String[] hourUnit = NUMS[hours % 10];
+        String[] hourTens = NUMS[hours / 10];
+        String[] hourOnes = NUMS[hours % 10];
 
-        String[] minDec = NUMS[minutes / 10];
-        String[] minUnit = NUMS[minutes % 10];
+        String[] minTens = NUMS[minutes / 10];
+        String[] minOnes = NUMS[minutes % 10];
 
-        String[] secDec = null;
-        String[] secUnit = null;
+        String[] secTens = null;
+        String[] secOnes = null;
 
         if (seconds > -1) {
-            secDec = NUMS[seconds / 10];
-            secUnit = NUMS[seconds % 10];
+            secTens = NUMS[seconds / 10];
+            secOnes = NUMS[seconds % 10];
         }
  
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < CHAR_LEN; i++) {
-            str.append(hourDec[i])
+            str.append(hourTens[i])
                .append("  ")
-               .append(hourUnit[i])
+               .append(hourOnes[i])
                .append(DOTS[i])
-               .append(minDec[i])
+               .append(minTens[i])
                .append("  ")
-               .append(minUnit[i]);
+               .append(minOnes[i]);
             if (seconds > -1) {
                 str.append(DOTS[i])
-                   .append(secDec[i])
+                   .append(secTens[i])
                    .append("  ")
-                   .append(secUnit[i]);
+                   .append(secOnes[i]);
             }
             if (!h24) {
                 str.append("      ")
-                   .append(APM[ampmIdx][i])
+                   .append(APM[amOrpmIdx][i])
                    .append("  ")
                    .append(APM[2][i]);
             }
